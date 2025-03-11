@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Drivers\" />
+    <Folder Include="NewFolder\" />
     <Folder Include="Support\" />
   </ItemGroup>
 
