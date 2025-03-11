@@ -40,6 +40,6 @@ jobs:
         password: ${{ secrets.EMAIL_PASS }}
         subject: "Build Status: ${{ job.status }}"
         body: "GitHub Actions Build Completed with status: ${{ job.status }}"
-        to: "recipient@example.com"
+        to: "shankariu8@gmail.com"
         from: "Umashankari <shankariu804@gmail.com>"
         secure: true
