@@ -1,7 +1,7 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: .NET Build
 
 on:
   push:
@@ -11,18 +11,35 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
+
+    - name: Restore Dependencies
       run: dotnet restore
-    - name: Build
+
+    - name: Build Project
       run: dotnet build --no-restore
-    - name: Test
+
+    - name: Run Tests
       run: dotnet test --no-build --verbosity normal
+
+    - name: Send Email Notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: "shankariu804@gmail.com"
+        password: ${{ secrets.EMAIL_PASS }}
+        subject: "Build Status: ${{ job.status }}"
+        body: "GitHub Actions Build Completed with status: ${{ job.status }}"
+        to: "recipient@example.com"
+        from: "Umashankari <shankariu804@gmail.com>"
+        secure: true
