@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium.Firefox;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using WebDriverManager.DriverConfigs.Impl;
@@ -31,10 +30,8 @@ namespace SwagProject.Hooks
         [BeforeTestRun]
         public static void BeforeTestRun()
         {
-            string reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+            string reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Artifacts", "Reports");
             string reportPath = Path.Combine(reportDirectory, "ExtentReport.html");
-
-            // ✅ Ensure Reports Directory Exists
             Directory.CreateDirectory(reportDirectory);
 
             _sparkReporter = new ExtentSparkReporter(reportPath);
@@ -53,12 +50,9 @@ namespace SwagProject.Hooks
         {
             TestContext.Progress.WriteLine("Initializing WebDriver...");
 
-            if (driver == null)
-            {
-                //driver = new FirefoxDriver();
-                driver = new ChromeDriver();
-            }
-
+            new DriverManager().SetUpDriver(new ChromeConfig());
+            driver = new ChromeDriver();
+            
             _scenarioContext["WebDriver"] = driver;
             _scenario = _feature.CreateNode(_scenarioContext.ScenarioInfo.Title);
         }
@@ -103,6 +97,7 @@ namespace SwagProject.Hooks
             if (driver != null)
             {
                 driver.Quit();
+                driver.Dispose();
                 driver = null;
             }
         }
@@ -123,15 +118,13 @@ namespace SwagProject.Hooks
                     return null;
                 }
 
-                Thread.Sleep(500);  // ✅ Small Wait Before Capturing Screenshot
+                Thread.Sleep(500);
                 Screenshot screenshot = ((ITakesScreenshot)driver).GetScreenshot();
 
-                string reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+                string reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Artifacts", "Reports");
                 string screenshotDirectory = Path.Combine(reportDirectory, "Screenshots");
+                Directory.CreateDirectory(screenshotDirectory);
 
-                Directory.CreateDirectory(screenshotDirectory);  // ✅ Ensure Folder Exists
-
-                // ✅ Generate a Safe Filename
                 string sanitizedStepName = string.Join("_", stepName.Split(Path.GetInvalidFileNameChars()));
                 string fileName = $"{scenarioName}_{sanitizedStepName}.png";
                 string filePath = Path.Combine(screenshotDirectory, fileName);
@@ -139,7 +132,7 @@ namespace SwagProject.Hooks
                 screenshot.SaveAsFile(filePath);
                 TestContext.Progress.WriteLine($"Screenshot saved: {filePath}");
 
-                return Path.Combine("Screenshots", fileName);  // ✅ Return Relative Path for Extent Report
+                return Path.Combine("Screenshots", fileName);
             }
             catch (Exception ex)
             {
@@ -149,5 +142,3 @@ namespace SwagProject.Hooks
         }
     }
 }
-
-
