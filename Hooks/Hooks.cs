@@ -48,10 +48,18 @@ namespace SwagProject.Hooks
         [BeforeScenario]
         public void Setup()
         {
-            TestContext.Progress.WriteLine("Initializing WebDriver...");
+            TestContext.Progress.WriteLine("Initializing WebDriver in headless mode...");
 
             new DriverManager().SetUpDriver(new ChromeConfig());
-            driver = new ChromeDriver();
+            ChromeOptions chromeOptions = new ChromeOptions();
+            
+            // Headless Mode & Additional Arguments for CI Environments
+            chromeOptions.AddArgument("--headless=new");
+            chromeOptions.AddArgument("--disable-gpu");
+            chromeOptions.AddArgument("--no-sandbox");
+            chromeOptions.AddArgument("--window-size=1920,1080");
+
+            driver = new ChromeDriver(chromeOptions);
             
             _scenarioContext["WebDriver"] = driver;
             _scenario = _feature.CreateNode(_scenarioContext.ScenarioInfo.Title);
