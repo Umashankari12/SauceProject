@@ -59,44 +59,13 @@ namespace SwagProject.Hooks
             chromeOptions.AddArgument("--no-sandbox");
             chromeOptions.AddArgument("--window-size=1920,1080");
 
+            // Set Chrome Binary Path explicitly
+            chromeOptions.BinaryLocation = "/usr/bin/google-chrome";
+
             driver = new ChromeDriver(chromeOptions);
             
             _scenarioContext["WebDriver"] = driver;
             _scenario = _feature.CreateNode(_scenarioContext.ScenarioInfo.Title);
-        }
-
-        [AfterStep]
-        public void InsertReportingSteps()
-        {
-            string stepText = _scenarioContext.StepContext.StepInfo.Text;
-            string screenshotPath = CaptureScreenshot(_scenarioContext.ScenarioInfo.Title, stepText);
-
-            if (_scenarioContext.TestError == null)
-            {
-                if (screenshotPath != null)
-                {
-                    _scenario.Log(Status.Pass, stepText,
-                        MediaEntityBuilder.CreateScreenCaptureFromPath(screenshotPath).Build());
-                }
-                else
-                {
-                    _scenario.Log(Status.Pass, stepText);
-                }
-            }
-            else
-            {
-                if (screenshotPath != null)
-                {
-                    _scenario.Log(Status.Fail, stepText,
-                        MediaEntityBuilder.CreateScreenCaptureFromPath(screenshotPath).Build());
-                }
-                else
-                {
-                    _scenario.Log(Status.Fail, stepText);
-                }
-
-                _scenario.Log(Status.Fail, _scenarioContext.TestError.Message);
-            }
         }
 
         [AfterScenario]
@@ -114,39 +83,6 @@ namespace SwagProject.Hooks
         public static void AfterTestRun()
         {
             _extent.Flush();
-        }
-
-        private string CaptureScreenshot(string scenarioName, string stepName)
-        {
-            try
-            {
-                if (driver == null || driver.WindowHandles.Count == 0)
-                {
-                    TestContext.Progress.WriteLine("WebDriver is null or browser is closed. Skipping screenshot.");
-                    return null;
-                }
-
-                Thread.Sleep(500);
-                Screenshot screenshot = ((ITakesScreenshot)driver).GetScreenshot();
-
-                string reportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Artifacts", "Reports");
-                string screenshotDirectory = Path.Combine(reportDirectory, "Screenshots");
-                Directory.CreateDirectory(screenshotDirectory);
-
-                string sanitizedStepName = string.Join("_", stepName.Split(Path.GetInvalidFileNameChars()));
-                string fileName = $"{scenarioName}_{sanitizedStepName}.png";
-                string filePath = Path.Combine(screenshotDirectory, fileName);
-
-                screenshot.SaveAsFile(filePath);
-                TestContext.Progress.WriteLine($"Screenshot saved: {filePath}");
-
-                return Path.Combine("Screenshots", fileName);
-            }
-            catch (Exception ex)
-            {
-                TestContext.Progress.WriteLine($"Failed to capture screenshot: {ex.Message}");
-                return null;
-            }
         }
     }
 }
