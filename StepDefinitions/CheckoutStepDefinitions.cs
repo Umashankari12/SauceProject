@@ -10,19 +10,17 @@ namespace SwagProject.StepDefinitions
     [Binding]
     public class CheckoutStepDefinitions
     {
-        private readonly IWebDriver driver;
         private readonly Checkout check;
 
         public CheckoutStepDefinitions(IWebDriver driver)
         {
-            this.driver = driver;
             check = new Checkout(driver);
         }
 
         [When(@"User clicks checkout button")]
         public void WhenUserClicksCheckoutButton()
         {
-            check.Checkout();
+            check.CheckoutProcess();
             Thread.Sleep(1000);
         }
 
@@ -36,7 +34,7 @@ namespace SwagProject.StepDefinitions
         [Then(@"Then Clicks on Continue")]
         public void ThenThenClicksOnContinue()
         {
-            check.Continued();
+            check.ContinueCheckout();
             Thread.Sleep(1000);
         }
     }
