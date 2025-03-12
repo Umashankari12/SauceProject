@@ -105,9 +105,9 @@
 using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers; // ✅ Import for ExpectedConditions
 using SwagProject.Pages;
 using TechTalk.SpecFlow;
+using SeleniumExtras.WaitHelpers; // ✅ Added correct namespace for ExpectedConditions
 
 namespace SwagProject.StepDefinitions
 {
@@ -152,7 +152,7 @@ namespace SwagProject.StepDefinitions
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             try
             {
-                wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='app_logo']")));
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='app_logo']")));
                 Console.WriteLine("✅ User successfully logged in.");
             }
             catch (WebDriverTimeoutException)
