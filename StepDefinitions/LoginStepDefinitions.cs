@@ -107,6 +107,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SwagProject.Pages;
 using TechTalk.SpecFlow;
+using SeleniumExtras.WaitHelpers;  // ✅ Fixed ExpectedConditions issue
 
 namespace SwagProject.StepDefinitions
 {
@@ -118,12 +119,12 @@ namespace SwagProject.StepDefinitions
 
         public LoginStepDefinitions(ScenarioContext scenarioContext)
         {
-            if (!scenarioContext.ContainsKey("WebDriver"))
+            if (!scenarioContext.ContainsKey("WebDriver") || scenarioContext["WebDriver"] == null)
             {
                 throw new Exception("WebDriver is not initialized. Ensure [BeforeScenario] in Hooks runs first.");
             }
 
-            driver = scenarioContext["WebDriver"] as IWebDriver;
+            driver = (IWebDriver)scenarioContext["WebDriver"];
             lp = new LoginPage(driver);
         }
 
