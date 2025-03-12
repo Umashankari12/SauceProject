@@ -1,45 +1,97 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET Build
-
+name: .NET SpecFlow Tests
+ 
 on:
+
   push:
+
     branches: [ "master" ]
+
   pull_request:
+
     branches: [ "master" ]
-
+ 
 jobs:
-  build:
+
+  test:
+
     runs-on: ubuntu-latest
-
+ 
     steps:
-    - name: Checkout Repository
+
+    - name: Checkout repository
+
       uses: actions/checkout@v4
-
+ 
     - name: Setup .NET
+
       uses: actions/setup-dotnet@v4
+
       with:
+
         dotnet-version: 6.0.x
+ 
+    - name: Install Google Chrome
 
-    - name: Restore Dependencies
+      run: |
+
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+
+        sudo apt update
+
+        sudo apt install -y google-chrome-stable
+ 
+    - name: Install Matching ChromeDriver
+
+      run: |
+
+        CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+
+        CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json" \
+
+          | jq -r ".versions[] | select(.version==\"$CHROME_VERSION\") | .downloads.chromedriver[] | select(.platform==\"linux64\") | .url")
+ 
+        if [[ -z "$CHROMEDRIVER_VERSION" ]]; then
+
+          echo "Error: No matching ChromeDriver found for Chrome version $CHROME_VERSION"
+
+          exit 1
+
+        fi
+ 
+        wget -O chromedriver.zip "$CHROMEDRIVER_VERSION"
+
+        unzip chromedriver.zip
+
+        sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+
+        sudo chmod +x /usr/local/bin/chromedriver
+
+        chromedriver --version
+ 
+    - name: Restore dependencies
+
+      working-directory: sauceLabs_PageObject  # ✅ Change to the project folder
+
       run: dotnet restore
+ 
+    - name: Build project
 
-    - name: Build Project
-      run: dotnet build --no-restore
+      working-directory: sauceLabs_PageObject  # ✅ Change to the project folder
 
-    - name: Run Tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet build --no-restore --configuration Release
+ 
+    - name: List available tests (for debugging)
 
-    - name: Send Email Notification
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 587
-        username: "shankariu804@gmail.com"
-        password: ${{ secrets.EMAIL_PASS }}
-        subject: "Build Status: ${{ job.status }}"
-        body: "GitHub Actions Build Completed with status: ${{ job.status }}"
-        to: "shankariu8@gmail.com"
-        from: "Umashankari <shankariu804@gmail.com>"
-        secure: true
+      working-directory: sauceLabs_PageObject  # ✅ Change to the project folder
+
+      run: dotnet test --list-tests
+ 
+    - name: Run SpecFlow Tests (Happy Flow)
+
+      working-directory: sauceLabs_PageObject
+
+      run: dotnet test --no-build --configuration Release --filter "FullyQualifiedName~ExecutionOfSaucedemo"
+ 
