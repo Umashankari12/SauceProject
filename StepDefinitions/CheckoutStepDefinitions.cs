@@ -10,11 +10,13 @@ namespace SwagProject.StepDefinitions
     [Binding]
     public class CheckoutStepDefinitions
     {
+        private readonly IWebDriver driver;
         private readonly Checkout check;
 
-        public CheckoutStepDefinitions()
+        public CheckoutStepDefinitions(IWebDriver driver)
         {
-            check = new Checkout();
+            this.driver = driver;
+            check = new Checkout(driver);
         }
 
         [When(@"User clicks checkout button")]
@@ -39,4 +41,3 @@ namespace SwagProject.StepDefinitions
         }
     }
 }
-
