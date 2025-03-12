@@ -27,16 +27,16 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: SwagProject/SwagProject  # ✅ Correct path!
+      working-directory: SwagProject  # ✅ FIXED PATH
 
     - name: Build project
       run: dotnet build --no-restore --configuration Release
-      working-directory: SwagProject/SwagProject  # ✅ Correct path!
+      working-directory: SwagProject  # ✅ FIXED PATH
 
     - name: List available tests (for debugging)
       run: dotnet test --list-tests
-      working-directory: SwagProject/SwagProject  # ✅ Correct path!
+      working-directory: SwagProject  # ✅ FIXED PATH
 
     - name: Run SpecFlow Tests
       run: dotnet test --no-build --configuration Release --filter "FullyQualifiedName~ExecutionOfSaucedemo"
-      working-directory: SwagProject/SwagProject  # ✅ Correct path!
+      working-directory: SwagProject  # ✅ FIXED PATH
