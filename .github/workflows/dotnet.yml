@@ -14,52 +14,29 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Debug Repository Structure
+      run: |
+        echo "Current Directory: $(pwd)"
+        ls -R
+      working-directory: ${{ github.workspace }}
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
 
-    - name: Install Dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y wget unzip curl jq libgbm-dev libxshmfence1 libasound2t64
-
-    - name: Install Google Chrome
-      run: |
-        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list'
-        sudo apt update
-        sudo apt install -y google-chrome-stable
-
-    - name: Install Matching ChromeDriver
-      run: |
-        CHROME_VERSION=$(google-chrome --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-        CHROMEDRIVER_URL=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json" \
-          | jq -r ".versions[] | select(.version==\"$CHROME_VERSION\") | .downloads.chromedriver[] | select(.platform==\"linux64\") | .url")
-
-        if [[ -z "$CHROMEDRIVER_URL" ]]; then
-          echo "Error: No matching ChromeDriver found for Chrome version $CHROME_VERSION"
-          exit 1
-        fi
-
-        wget -O chromedriver.zip "$CHROMEDRIVER_URL"
-        unzip chromedriver.zip
-        sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        chromedriver --version
-
     - name: Restore dependencies
-      working-directory: sauceLabs_PageObject  # ✅ Change to your project folder
       run: dotnet restore
+      working-directory: SwagProject/SwagProject  # ✅ Correct path!
 
     - name: Build project
-      working-directory: sauceLabs_PageObject  # ✅ Change to your project folder
       run: dotnet build --no-restore --configuration Release
+      working-directory: SwagProject/SwagProject  # ✅ Correct path!
 
     - name: List available tests (for debugging)
-      working-directory: sauceLabs_PageObject  # ✅ Change to your project folder
       run: dotnet test --list-tests
+      working-directory: SwagProject/SwagProject  # ✅ Correct path!
 
-    - name: Run SpecFlow Tests (Happy Flow)
-      working-directory: sauceLabs_PageObject
+    - name: Run SpecFlow Tests
       run: dotnet test --no-build --configuration Release --filter "FullyQualifiedName~ExecutionOfSaucedemo"
+      working-directory: SwagProject/SwagProject  # ✅ Correct path!
