@@ -104,6 +104,7 @@
 
 using System;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using SwagProject.Pages;
 using TechTalk.SpecFlow;
 
@@ -132,7 +133,7 @@ namespace SwagProject.StepDefinitions
             lp.LaunchBrowser();
         }
 
-        [When(@"User enters the Username ""([^""]*)"" and Password ""([^""]*)""")]
+        [When(@"User enters the Username \"([^\"]*)\" and Password \"([^\"]*)\"")]
         public void WhenUserEntersTheUsernameAndPassword(string username, string password)
         {
             lp.EnterUsernameAndPassword(username, password);
@@ -147,11 +148,13 @@ namespace SwagProject.StepDefinitions
         [Then(@"User is navigated to home page")]
         public void ThenUserIsNavigatedToHomePage()
         {
-            if (lp.IsHomePageDisplayed())
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            try
             {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='app_logo']")));
                 Console.WriteLine("✅ User successfully logged in.");
             }
-            else
+            catch (WebDriverTimeoutException)
             {
                 throw new Exception("❌ Home page not displayed. Login might have failed.");
             }
