@@ -107,7 +107,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SwagProject.Pages;
 using TechTalk.SpecFlow;
-using SeleniumExtras.WaitHelpers;  // ✅ Fixed ExpectedConditions issue
 
 namespace SwagProject.StepDefinitions
 {
@@ -119,12 +118,12 @@ namespace SwagProject.StepDefinitions
 
         public LoginStepDefinitions(ScenarioContext scenarioContext)
         {
-            if (!scenarioContext.ContainsKey("WebDriver") || scenarioContext["WebDriver"] == null)
+            if (!scenarioContext.ContainsKey("WebDriver"))
             {
                 throw new Exception("WebDriver is not initialized. Ensure [BeforeScenario] in Hooks runs first.");
             }
 
-            driver = (IWebDriver)scenarioContext["WebDriver"];
+            driver = scenarioContext["WebDriver"] as IWebDriver;
             lp = new LoginPage(driver);
         }
 
@@ -134,8 +133,8 @@ namespace SwagProject.StepDefinitions
             lp.LaunchBrowser();
         }
 
-        [When(@"User enters the Username ""([^""]*)"" and Password ""([^""]*)""")]
-        public void WhenUserEntersTheUsernameAndPassword(string username, string password)
+        [When(@"User enters ""([^""]*)"" and ""([^""]*)""")]
+        public void WhenUserEntersUsernameAndPassword(string username, string password)
         {
             lp.EnterUsernameAndPassword(username, password);
         }
