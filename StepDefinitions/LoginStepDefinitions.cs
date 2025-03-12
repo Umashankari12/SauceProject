@@ -124,7 +124,7 @@ namespace SwagProject.StepDefinitions
             }
 
             driver = scenarioContext["WebDriver"] as IWebDriver;
-            lp = new LoginPage(driver);  // ✅ Pass initialized WebDriver to LoginPage
+            lp = new LoginPage(driver);
         }
 
         [Given(@"User is on swag login page")]
@@ -133,7 +133,7 @@ namespace SwagProject.StepDefinitions
             lp.LaunchBrowser();
         }
 
-        [When(@"User enters the Username \"([^\"]*)\" and Password \"([^\"]*)\"")]
+        [When(@"User enters the Username ""([^""]*)"" and Password ""([^""]*)""")]
         public void WhenUserEntersTheUsernameAndPassword(string username, string password)
         {
             lp.EnterUsernameAndPassword(username, password);
