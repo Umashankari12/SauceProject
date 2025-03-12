@@ -41,43 +41,33 @@
 //}
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
 using SwagProject.Locators;
 
 namespace SwagProject.Pages
 {
-    internal class Checkout
+    public class Checkout
     {
-        IWebDriver driver = SwagProject.Hooks.Hooks.driver;
+        private readonly IWebDriver driver;
 
-        /* public Checkout(IWebDriver driver)
-         {
+        public Checkout(IWebDriver driver)
+        {
+            this.driver = driver;
+        }
 
-             this.driver = driver;
-         }*/
-        //locators on checkout page
-
-        //By checkoutbtn = By.XPath("//button[@id='checkout']");
-        //By checkOutFirstName = By.XPath("//input[@id='first-name']");
-        //By checkOutLastName = By.XPath("//input[@id='last-name']");
-        //By checkOutPostalCode = By.XPath("//input[@id='postal-code']");
-        //By continueCheckOut = By.XPath("//input[@id='continue']");
-        public void checkout()
+        public void CheckoutProcess()
         {
             driver.FindElement(check.checkoutbtn).Click();
         }
-        public void details(String firstname, String lastname, String zipcode)
+
+        public void EnterDetails(string firstname, string lastname, string zipcode)
         {
             driver.FindElement(check.checkOutFirstName).SendKeys(firstname);
             driver.FindElement(check.checkOutLastName).SendKeys(lastname);
             driver.FindElement(check.checkOutPostalCode).SendKeys(zipcode);
         }
-        public void continued()
+
+        public void ContinueCheckout()
         {
             driver.FindElement(check.continueCheckOut).Click();
         }
