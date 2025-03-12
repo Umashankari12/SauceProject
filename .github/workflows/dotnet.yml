@@ -1,42 +1,40 @@
-name: .NET SpecFlow Tests
+name: .NET CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "master" ]
+    branches:
+      - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Debug Repository Structure
-      run: |
-        echo "Current Directory: $(pwd)"
-        ls -R
-      working-directory: ${{ github.workspace }}
+      - name: Debug Repository Structure
+        run: |
+          echo "Current Directory: $(pwd)"
+          ls -R
+        working-directory: ${{ github.workspace }}
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 6.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x  # Change version if needed
 
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: SwagProject  # ✅ FIXED PATH
+      - name: Restore Dependencies
+        run: dotnet restore
+        working-directory: ${{ github.workspace }}
 
-    - name: Build project
-      run: dotnet build --no-restore --configuration Release
-      working-directory: SwagProject  # ✅ FIXED PATH
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ${{ github.workspace }}
 
-    - name: List available tests (for debugging)
-      run: dotnet test --list-tests
-      working-directory: SwagProject  # ✅ FIXED PATH
-
-    - name: Run SpecFlow Tests
-      run: dotnet test --no-build --configuration Release --filter "FullyQualifiedName~ExecutionOfSaucedemo"
-      working-directory: SwagProject  # ✅ FIXED PATH
+      - name: Run Tests
+        run: dotnet test --configuration Release --no-build --logger trx
+        working-directory: ${{ github.workspace }}
